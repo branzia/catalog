@@ -1,0 +1,35 @@
+{
+    "name": "branzia/catalog",
+    "description": "Branzia Catalog Package for Laravel",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "branzia/tax": "@dev"      
+    },
+    "autoload": {
+        "psr-4": {
+            "Branzia\\Catalog\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Visvanathan",
+            "email": "visvanathan.tech@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Branzia\\Catalog\\CatalogServiceProvider",
+                "Branzia\\Catalog\\CatalogPanelProvider"
+            ],
+            "aliases": {}
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
