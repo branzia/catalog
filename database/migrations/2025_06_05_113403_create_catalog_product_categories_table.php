@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('catalog_product_categories', function (Blueprint $table) {
-            $table->integer('product_id')->unsigned();
-            $table->integer('category_id')->unsigned();
-            $table->foreign('product_id')->references('id')->on('catalog_products')->onDelete('cascade');
-            $table->foreign('category_id')->references('id')->on('catalog_categories')->onDelete('cascade');        });
+            $table->foreignId('product_id')->constrained('catalog_products')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('catalog_categories')->onDelete('cascade');
+            $table->primary(['product_id', 'category_id']);
+        });
     }
 
     /**

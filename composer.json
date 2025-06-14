@@ -21,8 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Branzia\\Catalog\\CatalogServiceProvider",
-                "Branzia\\Catalog\\CatalogPanelProvider"
+                "Branzia\\Catalog\\CatalogServiceProvider"
             ],
             "aliases": {}
         }

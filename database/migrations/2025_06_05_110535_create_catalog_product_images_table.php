@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('type')->nullable();
             $table->string('path');
-            $table->integer('product_id')->unsigned();
             $table->integer('position')->default(0)->unsigned();
-            $table->foreign('product_id')->references('id')->on('catalog_products')->onDelete('cascade');
+            $table->unsignedBigInteger('product_id');
             $table->timestamps();
+            $table->foreign('product_id')->references('id')->on('catalog_products')->onDelete('cascade');
         });
     }
 

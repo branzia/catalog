@@ -3,7 +3,8 @@
 namespace Branzia\Catalog;
 use Illuminate\Support\Facades\File;
 use Branzia\Blueprint\BranziaServiceProvider;
-class CatalogServiceProvider extends BranziaServiceProvider
+use Branzia\Blueprint\Contracts\ProvidesFilamentDiscovery;
+class CatalogServiceProvider extends BranziaServiceProvider implements ProvidesFilamentDiscovery
 {
     public function moduleName(): string
     {
@@ -21,10 +22,26 @@ class CatalogServiceProvider extends BranziaServiceProvider
     public function register(): void
     {
         parent::register();
-        $this->app->register(CatalogPanelProvider::class);
         if ($this->app->runningInConsole()) {
             $this->commands([\Branzia\Catalog\Console\InstallCommand::class]);
         }
+    }
+    public static function filamentDiscoveryPaths(): array
+    {
+        return [
+            'resources' => [
+                ['path' => __DIR__.'/Filament/Resources', 'namespace' => 'Branzia\\Catalog\\Filament\\Resources'],
+            ],
+            'pages' => [
+                ['path' => __DIR__.'/Filament/Pages', 'namespace' => 'Branzia\\Catalog\\Filament\\Pages'],
+            ],
+            'clusters' => [
+                ['path' => __DIR__.'/Filament/Clusters', 'namespace' => 'Branzia\\Catalog\\Filament\\Clusters'],
+            ],
+            'widgets' => [
+                ['path' => __DIR__.'/Filament/Widgets', 'namespace' => 'Branzia\\Catalog\\Filament\\Widgets'],
+            ],
+        ];
     }
 }
 

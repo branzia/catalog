@@ -2,9 +2,9 @@
 
 namespace Branzia\Catalog\Filament\Resources;
 
-use Branzia\Catalog\Filament\Resources\ProductResource\Pages;
-use Branzia\Catalog\Filament\Resources\ProductResource\RelationManagers;
-use Branzia\Catalog\Models\Product;
+use Branzia\Catalog\Filament\Resources\AttributeResource\Pages;
+use Branzia\Catalog\Filament\Resources\AttributeResource\RelationManagers;
+use Branzia\Catalog\Models\Attribute;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,13 +12,15 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Database\Eloquent\Model;
-class ProductResource extends Resource
+
+class AttributeResource extends Resource
 {
-    protected static ?string $model = Product::class;
+    protected static ?string $model = Attribute::class;
+
     protected static ?string $navigationGroup = 'Catalog';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
+
     public static function form(Form $form): Form
     {
         return $form
@@ -56,10 +58,9 @@ class ProductResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProducts::route('/'),
-            'create' => Pages\CreateProduct::route('/create'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
+            'index' => Pages\ListAttributes::route('/'),
+            'create' => Pages\CreateAttribute::route('/create'),
+            'edit' => Pages\EditAttribute::route('/{record}/edit'),
         ];
     }
-    
 }

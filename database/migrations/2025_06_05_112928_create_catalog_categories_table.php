@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('attributes_values', function (Blueprint $table) {
+        Schema::create('catalog_categories', function (Blueprint $table) {
             $table->id();
-             $table->foreignId('attribute_id')->constrained('attributes')->onDelete('cascade');
-            $table->string('value', 100); // e.g. Red, Blue, Large
+            $table->string('name', 255);
+            $table->integer('parent_id')->unsigned()->nullable();
+            $table->integer('position')->default(0);
+            $table->boolean('status')->default(0);
             $table->timestamps();
-            $table->unique(['attribute_id', 'value']); // avoid duplicates
         });
     }
 
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('attributes_values');
+        Schema::dropIfExists('catalog_categoreis');
     }
 };

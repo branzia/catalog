@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('catalog_product_cross_sells', function (Blueprint $table) {
-            $table->integer('parent_id')->unsigned();
-            $table->integer('associate_id')->unsigned();
-            $table->foreign('parent_id')->references('id')->on('products')->onDelete('cascade');
-            $table->foreign('associate_id')->references('id')->on('products')->onDelete('cascade');        
+            $table->unsignedBigInteger('parent_id');
+            $table->unsignedBigInteger('associate_id');
+            $table->foreign('parent_id')->references('id')->on('catalog_products')->onDelete('cascade');
+            $table->foreign('associate_id')->references('id')->on('catalog_products')->onDelete('cascade');        
         });
     }
 

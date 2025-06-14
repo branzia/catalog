@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('catalog_product_custom_options', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('catalog_products')->onDelete('cascade');
             $table->string('title'); // e.g., "Engraving", "Gift Note"
             $table->enum('type', ['text', 'textarea', 'file', 'select', 'radio', 'checkbox']);
             $table->boolean('is_required')->default(false);

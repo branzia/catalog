@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('catalog_product_up_sells', function (Blueprint $table) {
-            $table->integer('parent_id')->unsigned();
-            $table->integer('associate_id')->unsigned();
+        Schema::create('catalog_product_relations', function (Blueprint $table) {
+            $table->unsignedBigInteger('parent_id');
+            $table->unsignedBigInteger('associate_id');
             $table->foreign('parent_id')->references('id')->on('catalog_products')->onDelete('cascade');
-            $table->foreign('associate_id')->references('id')->on('catalog_products')->onDelete('cascade');        });
+            $table->foreign('associate_id')->references('id')->on('catalog_products')->onDelete('cascade');        
+        });
     }
 
     /**
@@ -23,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('catalog_product_up_sells');
+        Schema::dropIfExists('catalog_product_relations');
     }
 };

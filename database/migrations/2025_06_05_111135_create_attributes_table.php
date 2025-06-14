@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('attributes', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // BIGINT UNSIGNED
             $table->string('code', 100)->unique(); // e.g. color, size
             $table->string('label', 255);
             $table->boolean('is_required')->default(false); 
