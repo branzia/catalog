@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('catalog_product_custom_options', function (Blueprint $table) {
+        Schema::create('catalog_product_customizable_options', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('catalog_products')->onDelete('cascade');
             $table->string('title'); // e.g., "Engraving", "Gift Note"
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('catalog_product_custom_options');
+        Schema::dropIfExists('catalog_product_customizable_options');
     }
 };

@@ -12,11 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('catalog_product_custom_options_values', function (Blueprint $table) {
+        Schema::create('catalog_product_customizable_options_values', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('custom_option_id')->constrained('catalog_product_custom_options')->onDelete('cascade');
+            $table->foreignId('option_id')->constrained('catalog_product_customizable_options')->onDelete('cascade');
             $table->string('label');      // e.g., "Red", "Large"
             $table->decimal('price', 10, 2)->default(0); // optional extra price            
+            $table->enum('type', ['fixed', 'percent']);
+            $table->integer('sort_order')->default(0); 
             $table->timestamps();
         });
     }
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('catalog_product_custom_options_values');
+        Schema::dropIfExists('catalog_product_customizable_options_values');
     }
 };

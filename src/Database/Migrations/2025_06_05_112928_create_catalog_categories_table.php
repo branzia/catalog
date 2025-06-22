@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('catalog_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
-            $table->integer('parent_id')->unsigned()->nullable();
-            $table->integer('position')->default(0);
-            $table->boolean('status')->default(0);
+            $table->string('slug')->nullable()->unique();
+            $table->integer('position')->nullable();
+            $table->boolean('is_active')->default(false);
+            $table->longText('description')->nullable();
+            $table->nestedSet();
             $table->timestamps();
         });
     }

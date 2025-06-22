@@ -14,15 +14,16 @@ return new class extends Migration
         Schema::create('catalog_products', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
+            $table->string('slug')->unique();
             $table->enum('product_type', ['simple', 'virtual','configurable','grouped','bundle','subscription'])->default('simple');
             $table->integer('parent_id')->unsigned()->nullable();
+            $table->text('short_description')->nullable();
+            $table->longText('description')->nullable();
             $table->string('sku', 100)->unique();
             $table->decimal('price', 10, 2);
             $table->decimal('special_price', 10, 2)->nullable();
             $table->date('special_price_from')->nullable();
             $table->date('special_price_to')->nullable();
-            $table->integer('qty')->default(0);
-            $table->enum('stock_status', ['in_stock', 'out_of_stock'])->default('in_stock');
             $table->enum('visibility', ['not_visible', 'catalog', 'search', 'catalog_search'])->default('catalog_search');
             $table->date('new_from')->nullable();
             $table->date('new_to')->nullable();

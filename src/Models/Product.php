@@ -2,10 +2,13 @@
 
 namespace Branzia\Catalog\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Branzia\Shop\Models\Inventory;
+use Branzia\Shop\Models\Warehouse;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Branzia\Shop\Models\Inventory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Product extends Model
 {
     use HasFactory;
@@ -86,17 +89,23 @@ class Product extends Model
     /**
      * Tax class relationship
      */
-    public function taxClass()
+    public function taxclass()
     {
         return $this->belongsTo(TaxClass::class, 'tax_class_id');
     }
-
+    public function inventories(): HasMany
+    {
+        return $this->hasMany(\Branzia\Shop\Models\Inventory::class);
+    }
     
     public function inventory():HasOne
     {
         return $this->hasOne(Inventory::class, 'product_id');
     }
-
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
     public function stockStatus(): string
     {
         return $this->inventory?->stock_status ?? 'out_of_stock';
@@ -105,5 +114,10 @@ class Product extends Model
     public function availableQty(): int
     {
         return $this->inventory?->availableQty() ?? 0;
-}
+    }
+
+    public function CustomizableOptions()
+    {
+        return $this->hasMany(CustomizableOption::class, 'product_id');
+    }
 }
