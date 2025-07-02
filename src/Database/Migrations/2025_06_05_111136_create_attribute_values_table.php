@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('attribute_id')->constrained('attributes')->onDelete('cascade');
             $table->string('value', 100); // e.g. Red, Blue, Large
+            $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
             $table->unique(['attribute_id', 'value']); // avoid duplicates
         });

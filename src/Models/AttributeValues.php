@@ -5,9 +5,9 @@ namespace Branzia\Catalog\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class AttributeValue extends Model
+class AttributeValues extends Model
 {
-    protected $table = 'attributes_values';
+    protected $table = 'attribute_values';
 
     protected $fillable = [
         'attribute_id',

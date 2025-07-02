@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Attribute extends Model
 {
+    protected $table = 'attributes';
     protected $fillable = [
         'code',
         'label',
@@ -19,6 +20,6 @@ class Attribute extends Model
 
     public function values(): HasMany
     {
-        return $this->hasMany(AttributeValue::class);
+        return $this->hasMany(AttributeValues::class);
     }
 }
