@@ -26,22 +26,6 @@ class CatalogServiceProvider extends BranziaServiceProvider implements ProvidesF
             $this->commands([\Branzia\Catalog\Console\InstallCommand::class]);
         }
     }
-    public static function filamentDiscoveryPaths(): array
-    {
-        return [
-            'resources' => [
-                ['path' => __DIR__.'/Filament/Resources', 'namespace' => 'Branzia\\Catalog\\Filament\\Resources'],
-            ],
-            'pages' => [
-                ['path' => __DIR__.'/Filament/Pages', 'namespace' => 'Branzia\\Catalog\\Filament\\Pages'],
-            ],
-            'clusters' => [
-                ['path' => __DIR__.'/Filament/Clusters', 'namespace' => 'Branzia\\Catalog\\Filament\\Clusters'],
-            ],
-            'widgets' => [
-                ['path' => __DIR__.'/Filament/Widgets', 'namespace' => 'Branzia\\Catalog\\Filament\\Widgets'],
-            ],
-        ];
-    }
+
 }
 
