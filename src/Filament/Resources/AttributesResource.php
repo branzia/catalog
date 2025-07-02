@@ -29,14 +29,8 @@ class AttributesResource extends Resource
         $baseSchema = [
             Section::make('Basic Information')->schema([
             Forms\Components\Fieldset::make('Attribute Info')->schema([
-                Forms\Components\TextInput::make('code')
-                ->required()
-                ->unique(ignoreRecord: true)
-                ->maxLength(50),
-
-            Forms\Components\TextInput::make('label')
-                ->required()
-                ->maxLength(100),
+                Forms\Components\TextInput::make('label')->required()->maxLength(100)->afterStateUpdated(fn ($state, callable $set) => $set('code', \Str::slug($state))),
+                Forms\Components\TextInput::make('code')->disabled()->dehydrated()->maxLength(50)->required()->unique(ignoreRecord: true),
             ]),
             Forms\Components\Toggle::make('is_required')->label('Required'),
             Forms\Components\Toggle::make('is_comparable')->label('Comparable'),
@@ -44,18 +38,48 @@ class AttributesResource extends Resource
             Forms\Components\Toggle::make('is_filterable')->label('Filterable'),
             Forms\Components\Toggle::make('is_visible_on_front')->label('Visible on Frontend'),
             ]),
-            Section::make('Options')->schema([
-            Forms\Components\Repeater::make('values')->relationship()->schema([
-                Forms\Components\TextInput::make('value')->required()->maxLength(255),
-            ])
-            ->label('Values')
-            ->defaultItems(1)
-            ->orderColumn('sort_order')
-            ->reorderable()
-            ->addActionLabel('Add Value')
-            ->collapsible()
-            ->columnSpan('full'),
-            ])
+            Section::make('Manage Values of Your Attribute')->schema([
+                Forms\Components\Select::make('type')->label('Attribute Type')
+                    ->options([
+                        'dropdown' => 'Dropdown',
+                        'visual_swatch' => 'Visual Swatch',
+                        'text_swatch' => 'Text Swatch',
+                    ])
+                    ->required()
+                    ->default('dropdown')
+                    ->reactive(),
+                Forms\Components\Toggle::make('use_product_image_for_swatch')->label('Use Product Image for Swatch if Possible')->visible(fn ($get) => $get('type') === 'visual_swatch'),                            
+                Forms\Components\Repeater::make('values')
+                    ->relationship()
+                    ->label('Values')
+                    ->defaultItems(1)
+                    ->orderColumn('sort_order')
+                    ->reorderable()
+                    ->addActionLabel('Add Value')
+                    ->collapsible()
+                    ->columns(3)
+                    ->schema([
+                        Forms\Components\Toggle::make('default')->label('is Default')->inline(false),
+                        Forms\Components\Hidden::make('swatch_type')
+                            ->default('color')
+                            ->visible(fn ($get, $livewire) =>
+                                ($livewire->data['type'] ?? null) === 'visual_swatch'
+                            )
+                            ->reactive(),
+                        Forms\Components\Hidden::make('swatch_type')->default('text')
+                            ->visible(fn ($get, $livewire) =>
+                                ($livewire->data['type'] ?? null) === 'text_swatch'
+                            ),
+                        Forms\Components\ColorPicker::make('swatch_value')->label('Swatch Color')
+                            ->visible(fn ($get, $livewire) =>
+                                ($livewire->data['type'] ?? null) === 'visual_swatch' &&
+                                $get('swatch_type') === 'color'
+                            ),
+                        Forms\Components\TextInput::make('swatch_value')->label('Swatch Text')->visible(fn ($livewire) => ($livewire->data['type'] ?? null) === 'text_swatch'),
+                        Forms\Components\TextInput::make('value')->required()->maxLength(255)->label('Value'),
+
+                    ]),
+            ])       
         ];
         return $form->schema(
             Form::withAdditionalField($baseSchema, static::class)

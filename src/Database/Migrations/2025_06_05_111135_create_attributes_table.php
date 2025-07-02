@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id(); // BIGINT UNSIGNED
             $table->string('code', 100)->unique(); // e.g. color, size
             $table->string('label', 255);
+            $table->string('type',20)->default('dropdown');
+            $table->boolean('use_product_image_for_swatch')->default(0);
             $table->boolean('is_required')->default(false); 
             $table->boolean('is_comparable')->default(0);
             $table->boolean('is_unique')->default(0);           

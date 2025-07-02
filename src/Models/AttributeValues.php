@@ -12,6 +12,10 @@ class AttributeValues extends Model
     protected $fillable = [
         'attribute_id',
         'value',
+        'swatch_type',
+        'swatch_value',
+        'sort_order',
+        'default'
     ];
 
     public function attribute(): BelongsTo
