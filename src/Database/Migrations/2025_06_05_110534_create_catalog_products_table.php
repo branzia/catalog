@@ -36,6 +36,7 @@ return new class extends Migration
             $table->boolean('is_giftable')->default(false);
             $table->foreignId('tax_class_id')->nullable()->constrained('tax_classes');
             $table->json('attributes')->nullable();     
+            $table->string('attribute_hash')->nullable()->unique();
             $table->timestamps();
         });
     }

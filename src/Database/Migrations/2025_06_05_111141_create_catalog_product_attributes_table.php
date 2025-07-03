@@ -15,11 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained('catalog_products')->onDelete('cascade');
             $table->foreignId('attribute_id')->constrained('attributes')->onDelete('cascade');
-            $table->foreignId('attribute_value_id')->nullable()->constrained('attribute_values')->onDelete('cascade');
-            $table->string('value', 255);            
-            $table->timestamps();
-            $table->index(['attribute_id', 'value'], 'idx_attribute_value');
-            $table->index('product_id');            
+            $table->index(['product_id', 'attribute_id'], 'idx_attribute_combination');
+            $table->index('product_id');      
         });
     }
 

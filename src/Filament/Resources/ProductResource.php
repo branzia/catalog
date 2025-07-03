@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Branzia\Catalog\Models\Product;
+use Branzia\Catalog\Models\Attribute;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Group;
@@ -27,7 +28,9 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Placeholder;
+
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\MarkdownEditor;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Branzia\Catalog\Filament\Resources\ProductResource\Pages;
@@ -44,7 +47,7 @@ class ProductResource extends Resource
         return $form->schema([
             Tabs::make('Heading')->tabs([
                 Tab::make('General')->schema([
-                    TextInput::make('name')->required()->maxLength(255)->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', Str::slug($state)) : null),
+                    TextInput::make('name')->required()->maxLength(255)->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', \Str::slug($state)) : null),
                     TextInput::make('sku')->required(),
                     TextInput::make('price')->required()->prefix('$')->numeric()->default(0),
                     Fieldset::make('Set Product as New')->schema([
@@ -83,8 +86,35 @@ class ProductResource extends Resource
                     ])->defaultItems(1)->minItems(1)->addActionLabel('Add Inventory')->columns(3)->extraAttributes(['class' => 'bg-gray-100 rounded-lg p-4']),
                 ]),
             ])->columnSpanFull(),    
+            Forms\Components\Section::make('Product Attributes')->schema([
+                Repeater::make('productAttributes')->relationship('productAttributes')->label('')->schema([
+                        Select::make('attribute_id')
+                            ->label('Attribute')
+                            ->options(Attribute::pluck('name', 'id'))
+                            ->searchable()
+                            ->required()
+                            ->reactive(),
+                        Select::make('attributeValues')->relationship('attributeValues')
+                            ->label('Value')
+                            ->options(function (callable $get): array {
+                                $attributeId = $get('attribute_id');
+                                if (!$attributeId) return [];
+                                return \Branzia\Catalog\Models\AttributeValues::where('attribute_id', $attributeId)->orderByDesc('default')->orderBy('sort_order')->pluck('value', 'id')->toArray() ?? [];
+                            })->multiple(function (callable $get): bool {
+                                $attributeId = $get('attribute_id');
+                                if (!$attributeId) return false;
+                                Attribute::find($attributeId);
+                                $attribute = Attribute::find($attributeId);
+                                return $attribute?->field_type === 'multiple';
+                            })->required(),
+                    ])
+                    ->columns(3)
+                    ->addActionLabel('Add Attribute')->extraAttributes([
+                        'class' => 'bg-gray-100 rounded-lg p-4' 
+                        ]),
+            ]),    
             Forms\Components\Section::make('Customizable Options')->schema([
-                    Repeater::make('CustomizableOptions')->label('')->relationship('CustomizableOptions')
+                    Repeater::make('customizableOptions')->label('')->relationship('customizableOptions')
                         ->schema([
                             TextInput::make('title')->label('Option Title')->required(),
                             Select::make('type')->label('Option Type')
@@ -110,7 +140,7 @@ class ProductResource extends Resource
                         ->collapsible()
                         ->defaultItems(0)->columns(3)
                         ->columnSpanFull()
-                        ->addActionLabel('Add Option')->reorderable(true)->collapsed()->extraAttributes([
+                        ->addActionLabel('Add Option')->reorderable(true)->extraAttributes([
                         'class' => 'bg-gray-100 rounded-lg p-4' 
                         ])
             ])            

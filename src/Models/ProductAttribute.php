@@ -3,15 +3,17 @@
 namespace Branzia\Catalog\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ProductAttribute extends Model
 {
+    protected $table = 'catalog_product_attributes';
+    public $timestamps = false;
     protected $fillable = [
         'product_id',
         'attribute_id',
-        'attribute_value_id',
-        'value',
     ];
 
     public function product(): BelongsTo
@@ -23,9 +25,13 @@ class ProductAttribute extends Model
     {
         return $this->belongsTo(Attribute::class, 'attribute_id');
     }
-
-    public function attributeValue(): BelongsTo
+    public function attributeValueLinks(): HasMany
     {
-        return $this->belongsTo(AttributeValue::class, 'attribute_value_id');
+        return $this->hasMany(ProductAttributeValues::class, 'product_attribute_id');
+    }
+    
+    public function attributeValues(): BelongsToMany
+    {
+        return $this->belongsToMany(AttributeValues::class,'catalog_product_attribute_values','product_attribute_id','attribute_value_id');
     }
 }

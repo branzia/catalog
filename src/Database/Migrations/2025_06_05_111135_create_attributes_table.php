@@ -14,12 +14,11 @@ return new class extends Migration
         Schema::create('attributes', function (Blueprint $table) {
             $table->id(); // BIGINT UNSIGNED
             $table->string('code', 100)->unique(); // e.g. color, size
-            $table->string('label', 255);
+            $table->string('name', 255);
             $table->string('type',20)->default('dropdown');
+            $table->enum('field_type', ['single', 'multiple'])->default('single');
             $table->boolean('use_product_image_for_swatch')->default(0);
-            $table->boolean('is_required')->default(false); 
             $table->boolean('is_comparable')->default(0);
-            $table->boolean('is_unique')->default(0);           
             $table->boolean('is_filterable')->default(0);
             $table->boolean('is_visible_on_front')->default(0);
             $table->timestamps();

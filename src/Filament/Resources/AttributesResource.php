@@ -29,12 +29,11 @@ class AttributesResource extends Resource
         $baseSchema = [
             Section::make('Basic Information')->schema([
             Forms\Components\Fieldset::make('Attribute Info')->schema([
-                Forms\Components\TextInput::make('label')->required()->maxLength(100)->afterStateUpdated(fn ($state, callable $set) => $set('code', \Str::slug($state))),
+                Forms\Components\TextInput::make('name')->required()->maxLength(100)->afterStateUpdated(fn ($state, callable $set) => $set('code', \Str::slug($state))),
                 Forms\Components\TextInput::make('code')->disabled()->dehydrated()->maxLength(50)->required()->unique(ignoreRecord: true),
             ]),
-            Forms\Components\Toggle::make('is_required')->label('Required'),
+            Forms\Components\Select::make('field_type')->label('Field Type')->options(['single' => 'Single Select','multiple' => 'Multiple Select'])->default('single')->required(),
             Forms\Components\Toggle::make('is_comparable')->label('Comparable'),
-            Forms\Components\Toggle::make('is_unique')->label('Unique'),
             Forms\Components\Toggle::make('is_filterable')->label('Filterable'),
             Forms\Components\Toggle::make('is_visible_on_front')->label('Visible on Frontend'),
             ]),
@@ -90,10 +89,9 @@ class AttributesResource extends Resource
     {
         return $table->columns([
             Tables\Columns\TextColumn::make('code')->searchable()->sortable(),
-            Tables\Columns\TextColumn::make('label')->searchable()->sortable(),
-            Tables\Columns\IconColumn::make('is_required')->boolean(),
+            Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
             Tables\Columns\IconColumn::make('is_comparable')->boolean(),
-            Tables\Columns\IconColumn::make('is_unique')->boolean(),
+            Tables\Columns\TextColumn::make('field_type'),
             Tables\Columns\IconColumn::make('is_filterable')->boolean(),
             Tables\Columns\IconColumn::make('is_visible_on_front')->boolean(),
         ])

@@ -16,4 +16,11 @@ class EditProduct extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+    public function generateVariants() {
+        $attributeValues = $this->form->getState()['variant_builder']['attribute_values'] ?? [];
+        $variants = \Branzia\Catalog\Support\VariantHelper::generate($attributeValues);
+        $this->form->fill([
+            'variant_combinations' => $variants,
+        ]);
+    }
 }

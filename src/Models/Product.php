@@ -27,6 +27,7 @@ class Product extends Model
      */
     protected $fillable = [
         'name',
+        'slug',
         'product_type',
         'parent_id',
         'sku',
@@ -116,8 +117,37 @@ class Product extends Model
         return $this->inventory?->availableQty() ?? 0;
     }
 
-    public function CustomizableOptions()
+    public function customizableOptions()
     {
         return $this->hasMany(CustomizableOption::class, 'product_id');
+    }
+    public function getAttributeSummaryAttribute(): string
+    {
+        return collect($this->attributes)->map(fn ($value, $key) => ucfirst($key) . ': ' . ucfirst($value))->implode(', ');
+    }
+    public function isConfigurable(): bool
+    {
+        return $this->product_type === 'configurable';
+    }
+
+    public function productAttributes()
+    {
+        return $this->hasMany(ProductAttribute::class, 'product_id');
+    }
+    public function allAttributesWithValues()
+{
+    return $this->productAttributes()->with('attribute', 'attributeValues')->get();
+}
+    protected static function booted(): void
+    {
+        static::creating(function (Product $product) {
+            if (empty($product->slug)) {
+                $product->slug = \Str::slug($product->name);
+            }
+            if ($product->parent_id && $product->attributes) {
+                $product->attribute_hash = md5(json_encode($product->attributes));
+            }
+        });
+   
     }
 }

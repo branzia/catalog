@@ -11,19 +11,18 @@ class Attribute extends Model
     protected $table = 'attributes';
     protected $fillable = [
         'code',
-        'label',
+        'name',
         'type',
+        'field_type',
         'use_product_image_for_swatch',
-        'is_required',
         'is_comparable',
-        'is_unique',
         'is_filterable',
         'is_visible_on_front',
     ];
 
     public function values(): HasMany
     {
-        return $this->hasMany(AttributeValues::class);
+        return $this->hasMany(AttributeValues::class, 'attribute_id');
     }
 
     protected static function booted(): void
