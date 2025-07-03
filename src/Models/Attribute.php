@@ -15,6 +15,7 @@ class Attribute extends Model
         'type',
         'field_type',
         'use_product_image_for_swatch',
+        'is_configurable',
         'is_comparable',
         'is_filterable',
         'is_visible_on_front',

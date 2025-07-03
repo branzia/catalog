@@ -33,6 +33,7 @@ class AttributesResource extends Resource
                 Forms\Components\TextInput::make('code')->disabled()->dehydrated()->maxLength(50)->required()->unique(ignoreRecord: true),
             ]),
             Forms\Components\Select::make('field_type')->label('Field Type')->options(['single' => 'Single Select','multiple' => 'Multiple Select'])->default('single')->required(),
+            Forms\Components\Toggle::make('is_configurable')->label('Configurable?'),
             Forms\Components\Toggle::make('is_comparable')->label('Comparable'),
             Forms\Components\Toggle::make('is_filterable')->label('Filterable'),
             Forms\Components\Toggle::make('is_visible_on_front')->label('Visible on Frontend'),

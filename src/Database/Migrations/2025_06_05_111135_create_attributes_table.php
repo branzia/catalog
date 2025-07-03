@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('type',20)->default('dropdown');
             $table->enum('field_type', ['single', 'multiple'])->default('single');
             $table->boolean('use_product_image_for_swatch')->default(0);
+            $table->boolean('is_configurable')->default(0);
             $table->boolean('is_comparable')->default(0);
             $table->boolean('is_filterable')->default(0);
             $table->boolean('is_visible_on_front')->default(0);

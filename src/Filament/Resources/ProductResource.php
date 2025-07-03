@@ -2,7 +2,7 @@
 
 namespace Branzia\Catalog\Filament\Resources;
 
-
+use Closure;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
@@ -91,9 +91,10 @@ class ProductResource extends Resource
                         Select::make('attribute_id')
                             ->label('Attribute')
                             ->options(Attribute::pluck('name', 'id'))
-                            ->searchable()
-                            ->required()
-                            ->reactive(),
+                            ->reactive()->afterStateUpdated(function (callable $set) {
+                                $set('attributeValues', null); 
+                            })
+                            ->required(),
                         Select::make('attributeValues')->relationship('attributeValues')
                             ->label('Value')
                             ->options(function (callable $get): array {
@@ -103,16 +104,12 @@ class ProductResource extends Resource
                             })->multiple(function (callable $get): bool {
                                 $attributeId = $get('attribute_id');
                                 if (!$attributeId) return false;
-                                Attribute::find($attributeId);
                                 $attribute = Attribute::find($attributeId);
                                 return $attribute?->field_type === 'multiple';
                             })->required(),
-                    ])
-                    ->columns(3)
-                    ->addActionLabel('Add Attribute')->extraAttributes([
-                        'class' => 'bg-gray-100 rounded-lg p-4' 
-                        ]),
+                    ])->columns(2)->addActionLabel('Add Attribute')->extraAttributes(['class' => 'bg-gray-100 rounded-lg p-4']),
             ]),    
+            
             Forms\Components\Section::make('Customizable Options')->schema([
                     Repeater::make('customizableOptions')->label('')->relationship('customizableOptions')
                         ->schema([
@@ -180,6 +177,28 @@ class ProductResource extends Resource
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
+    }
+
+    protected static function getVariants(callable $get) {
+        $variants = [];
+        $ids = $get('selected_attributes') ?? [];
+
+        $attributes = \Branzia\Catalog\Models\Attribute::whereIn('id', $ids)
+            ->with('values')
+            ->get();
+
+        foreach ($attributes as $attribute) {
+            $variants[] = CheckboxList::make("attribute_values.{$attribute->id}")
+                ->label($attribute->name ?? 'Attribute')
+                ->options(
+                    $attribute->values
+                        ->pluck('value')
+                        ->mapWithKeys(fn ($v) => [$v => ucfirst($v)])
+                        ->toArray()
+                )->required();
+        }
+
+        return $variants;
     }
     
 }
