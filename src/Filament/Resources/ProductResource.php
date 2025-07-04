@@ -121,7 +121,7 @@ class ProductResource extends Resource
                                     'select' => 'Select',
                                     'radio' => 'Radio',
                                     'checkbox' => 'Checkbox',
-                                ])->required(),
+                                ])->reactive()->required(),
                             Checkbox::make('is_required')->label('Required'),
                             Repeater::make('values')->label('')->relationship('values')->schema([
                                 TextInput::make('label')->label('Title')->required(),
@@ -131,7 +131,20 @@ class ProductResource extends Resource
                                     'fixed' => 'Fixed',
                                     'percent' => 'Percent'
                                 ]),
-                            ])->collapsible()->columnSpanFull()->defaultItems(0)->columns(3)->addActionLabel('Add Value')->addActionAlignment(Alignment::Start)->orderColumn('sort_order'),
+                            ])->defaultItems(0)
+                            ->columns(3)
+                            ->addActionLabel('Add Value')
+                            ->addActionAlignment(Alignment::Start)
+                            ->orderColumn('sort_order')
+                            ->addable(function (callable $get): bool {
+                                $type = $get('type');
+                                $values = $get('values') ?? [];
+                                // If type is 'text' and already one value exists, disable add
+                                if ($type === 'text' && count($values) >= 1) {
+                                    return false;
+                                }
+                                return true;
+                            }),
                         ])->orderColumn('sort_order')
                         ->collapsible()
                         ->defaultItems(0)->columns(3)
