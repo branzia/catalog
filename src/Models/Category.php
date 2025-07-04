@@ -2,11 +2,13 @@
 
 namespace Branzia\Catalog\Models;
 
+use Illuminate\Support\Str;
+use Kalnoy\Nestedset\NodeTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Kalnoy\Nestedset\NodeTrait;
 use Studio15\FilamentTree\Concerns\InteractsWithTree;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 class Category extends Model
 {
     use NodeTrait;
@@ -46,4 +48,19 @@ class Category extends Model
             }
         });
     }
+
+
+    public function getIndentedNameAttribute(): string
+    {
+        return str_repeat('-- ', $this->depth) . $this->name;
+    }
+    public function parent()
+    {
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function products(): BelongsToMany {
+        return $this->belongsToMany(Product::class,'catalog_product_categories');
+    }
+
 }

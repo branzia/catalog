@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
 {
@@ -87,6 +88,7 @@ class Product extends Model
         return $this->hasMany(Product::class, 'parent_id');
     }
 
+
     /**
      * Tax class relationship
      */
@@ -130,14 +132,12 @@ class Product extends Model
         return $this->product_type === 'configurable';
     }
 
-    public function productAttributes()
-    {
+    public function productAttributes() {
         return $this->hasMany(ProductAttribute::class, 'product_id');
     }
-    public function allAttributesWithValues()
-{
-    return $this->productAttributes()->with('attribute', 'attributeValues')->get();
-}
+    public function allAttributesWithValues() {
+        return $this->productAttributes()->with('attribute', 'attributeValues')->get();
+    }
     protected static function booted(): void
     {
         static::creating(function (Product $product) {
@@ -148,6 +148,9 @@ class Product extends Model
                 $product->attribute_hash = md5(json_encode($product->attributes));
             }
         });
-   
+    }
+
+    public function categories():BelongsToMany {
+        return $this->belongsToMany(Category::class,'catalog_product_categories');
     }
 }

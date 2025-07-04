@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name', 255);
             $table->string('slug')->unique();
             $table->enum('product_type', ['simple', 'virtual','configurable','grouped','bundle','subscription'])->default('simple');
-            $table->integer('parent_id')->unsigned()->nullable();
+            $table->foreignId('parent_id')->nullable()->constrained('catalog_products', 'id')->onDelete('cascade');
             $table->text('short_description')->nullable();
             $table->longText('description')->nullable();
             $table->string('sku', 100)->unique();
