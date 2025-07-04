@@ -91,10 +91,11 @@ class AttributesResource extends Resource
         return $table->columns([
             Tables\Columns\TextColumn::make('code')->searchable()->sortable(),
             Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
-            Tables\Columns\IconColumn::make('is_comparable')->boolean(),
             Tables\Columns\TextColumn::make('field_type'),
-            Tables\Columns\IconColumn::make('is_filterable')->boolean(),
-            Tables\Columns\IconColumn::make('is_visible_on_front')->boolean(),
+            Tables\Columns\IconColumn::make('is_configurable')->label('Configurable')->boolean(),
+            Tables\Columns\IconColumn::make('is_comparable')->label('Comparable')->boolean(),
+            Tables\Columns\IconColumn::make('is_filterable')->label('Filterable')->boolean(),
+            Tables\Columns\IconColumn::make('is_visible_on_front')->label('Visibile on Fron')->boolean(),
         ])
         ->filters([
             // Add filters if needed

@@ -70,8 +70,7 @@ class ProductResource extends Resource
                     Repeater::make('inventories')->label('')->relationship('inventories')->schema([
                         Select::make('warehouse_id')
                             ->label('Warehouse')
-                            ->options(\Branzia\Shop\Models\Warehouse::all()->pluck('name', 'id'))
-                            ->required(),
+                            ->options(\Branzia\Shop\Models\Warehouse::all()->pluck('name', 'id')),
                         TextInput::make('qty')
                             ->label('Quantity')
                             ->numeric()
@@ -148,7 +147,9 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('id')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('sku')->searchable()->sortable(),
             ])
             ->filters([
                 //

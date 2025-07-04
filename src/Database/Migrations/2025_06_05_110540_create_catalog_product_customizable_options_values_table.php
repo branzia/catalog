@@ -16,8 +16,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('option_id')->constrained('catalog_product_customizable_options')->onDelete('cascade');
             $table->string('label');      // e.g., "Red", "Large"
+            $table->string('sku', 100)->unique();
             $table->decimal('price', 10, 2)->default(0); // optional extra price            
             $table->enum('type', ['fixed', 'percent']);
+            $table->string('compatible_extensions',100)->nullable();
+            $table->integer('max_characters')->default(250);
             $table->integer('sort_order')->default(0); 
             $table->timestamps();
         });
