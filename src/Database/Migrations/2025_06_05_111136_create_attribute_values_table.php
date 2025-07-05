@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('attribute_id')->constrained('attributes')->onDelete('cascade');
             $table->string('value', 100); // e.g. Red, Blue, Large
-            $table->string('swatch_type')->nullable(); // 'color', 'image', 'text'
             $table->string('swatch_value')->nullable(); // #ff0000, path/to/image.png, or text
             $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('default')->default(false);
