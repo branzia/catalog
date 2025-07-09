@@ -33,6 +33,8 @@ class Product extends Model
         'parent_id',
         'sku',
         'price',
+        'short_description',
+        'description',
         'special_price',
         'special_price_from',
         'special_price_to',
@@ -146,11 +148,37 @@ class Product extends Model
             }
             if ($product->parent_id && $product->attributes) {
                 $product->attribute_hash = md5(json_encode($product->attributes));
+                $product->is_active = 1;
+                $parent = Product::find($product->parent_id);
+                if ($parent) {
+                    // Inherit fields from parent
+                    $product->short_description = $parent->short_description;
+                    $product->description = $parent->description;
+                    $product->weight = $parent->weight;
+                    $product->width = $parent->width;
+                    $product->height = $parent->height;
+                    $product->length = $parent->length;
+                    $product->tax_class_id = $parent->tax_class_id;
+                    $product->is_giftable = $parent->is_giftable;
+                }
+            }
+        });
+        static::saving(function ($product) {
+            if ($product->variants()->exists()) {
+                $product->product_type = 'configurable';
             }
         });
     }
 
     public function categories():BelongsToMany {
         return $this->belongsToMany(Category::class,'catalog_product_categories');
+    }
+
+    public function images():HasMany {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    public function image(string $type){
+        return $this->images()->where('type', $type)->first();
     }
 }

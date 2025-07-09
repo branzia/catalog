@@ -22,9 +22,6 @@ class CatalogServiceProvider extends BranziaServiceProvider implements ProvidesF
     public function register(): void
     {
         parent::register();
-        if ($this->app->runningInConsole()) {
-            $this->commands([\Branzia\Catalog\Console\InstallCommand::class]);
-        }
     }
 
 }

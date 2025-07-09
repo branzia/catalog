@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductImage extends Model
 {
+    protected $table = 'catalog_product_images';
     protected $fillable = [
-        'type',        // e.g. 'base', 'thumbnail', 'gallery'
+        'is_base_image',        
         'path',        // path or URL to the image
         'product_id',
         'position',

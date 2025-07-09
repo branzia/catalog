@@ -31,6 +31,7 @@ use Filament\Forms\Components\Textarea;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\MultiSelect;
 use Filament\Forms\Components\Placeholder;
@@ -113,6 +114,14 @@ class ProductResource extends Resource
                     MarkdownEditor::make('short_description'),    
                     MarkdownEditor::make('description'),    
                 ]),
+                Tab::make('Images')->schema([
+                    Repeater::make('images')->relationship('images')->label('Product Images')
+                        ->schema([
+                            FileUpload::make('path')->label('Image')->required()->image()->disk('public')->directory('products/images')->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->visibility('public'),
+                            Toggle::make('is_base_image')->label('Is Base Image?'),
+                            Hidden::make('position')->default(0),
+                    ])->defaultItems(1)->reorderable('position')
+                ]),
                 Tab::make('Advanced Pricing')->schema([
                     Fieldset::make('Special Price')->schema([
                         TextInput::make('special_price')->label('Price')->prefix('$')->numeric(),
@@ -139,7 +148,7 @@ class ProductResource extends Resource
                     ])->defaultItems(1)->minItems(1)->addActionLabel('Add Inventory')->columns(3)->extraAttributes(['class' => 'bg-gray-100 rounded-lg p-4']),
                 ]),
                 Tab::make('Customizable Options')->schema([
-                    Repeater::make('customizableOptions')->label('Custom options let customers choose the product variations they want.')->relationship('customizableOptions')
+                    Repeater::make('customizableOptions')->label('Customizable options allow customers to configure product variations before purchase.')->relationship('customizableOptions')
                         ->schema([
                             TextInput::make('title')->label('Option Title')->required(),
                             Select::make('type')->label('Option Type')
@@ -243,17 +252,20 @@ class ProductResource extends Resource
                                 if (!$attributeId) return false;
                                 $attribute = Attribute::find($attributeId);
                                 return $attribute?->field_type === 'multiple';
-                            })->live()->required()->statePath('attributeValues'),
-                    ])->columns(2)->addActionLabel('Add Attribute')->extraAttributes(['class' => 'bg-gray-100 rounded-lg p-4']),
+                            })->preload()->required()->statePath('attributeValues'),
+                    ])->columns(2)->defaultItems(0)->addActionLabel('Add Attribute')->extraAttributes(['class' => 'bg-gray-100 rounded-lg p-4']),
             ]),    
             Forms\Components\Section::make('Variant Configurations')->schema([ 
                 Actions::make([
                     Action::make('build_variants')
                     ->label('Build Variants')
                     ->icon('heroicon-o-plus-circle')
-                    ->stickyModalFooter()
+                    ->stickyModalHeader()
                     ->form([
-                        Fieldset::make('Attribute Variants')
+                        Hidden::make('name'),
+                        Hidden::make('sku'),
+                        Hidden::make('price'),
+                        Fieldset::make('Configurable Attributes')
                         ->schema(function () {
                             return \Branzia\Catalog\Models\Attribute::where('is_configurable', 1)
                                 ->with('values')
@@ -266,22 +278,71 @@ class ProductResource extends Resource
                                 })
                                 ->toArray();
                         }),
+                    ])->fillForm(fn (callable $get): array => [
+                        'name' => $get('name'),
+                        'sku' => $get('sku'),
+                        'price' => $get('price'),
                     ])
                     ->action(function (array $data, \Filament\Forms\Set $set,\Filament\Forms\Get $get) {
+                        $name = $data['name'] ?? '';
+                        $sku = $data['sku'] ?? '';
+                        $price = $data['price'] ?? '0';
                         $attributes = $data['selected_attributes'] ?? [];
-                        $combinations = \Branzia\Catalog\Support\VariantHelper::generate($attributes);
+                        $combinations = \Branzia\Catalog\Support\VariantHelper::generate($attributes,$name,$sku,$price);
                         // Fill the variant_products repeater
                         $existingVariants = $get('variants') ?? []; // ← Get current repeater data
-                        $set('variants', array_merge($existingVariants, $combinations));
-                        \Filament\Notifications\Notification::make()->title('Variants generated successfully.')->success()->send();
+                         // 3. Extract attribute hashes of existing variants
+                        $existingHashes = collect($existingVariants)
+                            ->map(fn ($variant) => md5(json_encode($variant['attributes'])))
+                            ->toArray();
+
+                        $deduplicated = [];
+                        $duplicates = 0;
+
+                        foreach ($combinations as $combo) {
+                            $hash = md5(json_encode($combo['attributes']));
+                            if (!in_array($hash, $existingHashes)) {
+                                $deduplicated[] = $combo;
+                            } else {
+                                $duplicates++;
+                            }
+                        }
+
+                        if ($duplicates > 0) {
+                            \Filament\Notifications\Notification::make()
+                                ->title("⚠️ {$duplicates} duplicate variant(s) skipped.")
+                                ->warning()
+                                ->send();
+                        }
+
+                        if (count($deduplicated)) {
+                            $set('variants', array_merge($existingVariants, $deduplicated));
+                            \Filament\Notifications\Notification::make()
+                                ->title('✅ New variants generated successfully.')
+                                ->success()
+                                ->send();
+                        } else {
+                            \Filament\Notifications\Notification::make()
+                                ->title('ℹ️ No new variants generated.')
+                                ->info()
+                                ->send();
+                        }
                     }),
-                ]), 
-                Repeater::make('variants')->relationship('variants')->label('Variant Products')->schema([
-                    TextInput::make('name'),
-                    TextInput::make('sku')->required(),
-                    TextInput::make('price')->numeric()->default(0),
+                ])->alignEnd(), 
+                Repeater::make('variants')->relationship('variants')->label('')->schema([
+                    TextInput::make('sku')->required()->columnSpan(1),
+                    TextInput::make('price')->required()->prefix('$')->numeric()->columnSpan(1),
+                    Repeater::make('inventories')->label('')->relationship('inventories')->schema([
+                        Select::make('warehouse_id')->label('Warehouse')->options(\Branzia\Shop\Models\Warehouse::all()->pluck('name', 'id'))->default(1)->required(),
+                        TextInput::make('qty')->label('Quantity')->numeric()->default(0)->required(),
+                        Select::make('stock_status')->label('Stock Status')->options(['in_stock' => 'In Stock','out_of_stock' => 'Out of Stock'])->default('in_stock')->required(),
+                    ])->defaultItems(1)->minItems(1)->addActionLabel('Add Inventory')->columns(3)->extraAttributes(['class' => 'bg-gray-100 rounded-lg p-4'])->columnSpanFull(),
+                    Hidden::make('id'),
+                    Hidden::make('name'),
+                    Hidden::make('product_type'),
+                    Hidden::make('visibility'),
                     Hidden::make('attributes'),
-                ])->columns(3)->columnSpanFull()->addable(false),
+                ])->defaultItems(0)->columns(['sm' => 1,'md'=> 2,'xl' => 2,'2xl' => 2])->columnSpanFull()->itemLabel(fn (array $state): ?string => $state['name'] ?? null)->addable(false),
             ]),
             
         ]);

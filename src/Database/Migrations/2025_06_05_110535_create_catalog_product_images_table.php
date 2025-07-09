@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('catalog_product_images', function (Blueprint $table) {
             $table->id();
-            $table->string('type')->nullable();
+            $table->boolean('is_base_image')->default(false);
             $table->string('path');
             $table->integer('position')->default(0)->unsigned();
             $table->unsignedBigInteger('product_id');

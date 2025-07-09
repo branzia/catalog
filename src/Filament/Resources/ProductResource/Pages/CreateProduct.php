@@ -9,11 +9,5 @@ class CreateProduct extends CreateRecord
 {
     protected static string $resource = ProductResource::class;
 
-    protected function getFormActions(): array
-    {
-        return [
-            ...parent::getFormActions(),
-            Action::make('close')->action('createAndClose'),
-        ];
-    }
+    
 }

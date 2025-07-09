@@ -3,7 +3,7 @@ namespace Branzia\Catalog\Support;
 
 class VariantHelper
 {
-    public static function generate(array $attributes): array {  
+    public static function generate(array $attributes,$name,$sku,$price): array {  
         if (empty($attributes)) return [];
 
         // Load attribute and value names
@@ -34,12 +34,16 @@ class VariantHelper
         }
 
         // Return structured variant items
-        return collect($combinations)->map(function ($combo) use ($attributeNames) {
+        return collect($combinations)->map(function ($combo) use ($name,$sku,$price) {
             return [
-                'sku' => implode('-', $combo),
-                'name' => implode(' - ', $combo),
-                'price' => 0,
+                'name' => $name.'-'.implode('-', $combo),
+                'sku' => strtolower($sku.'-'.implode('-', $combo)),
+                'price' => $price,
+                'weight' => '',
+                'product_type' => 'simple',
+                'visibility' => 'not_visible',
                 'attributes' => array_values($combo),
+                
             ];
         })->toArray();
     }
