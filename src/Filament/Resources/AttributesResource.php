@@ -60,21 +60,9 @@ class AttributesResource extends Resource
                     ->columns(3)
                     ->schema([
                         Forms\Components\Toggle::make('default')->label('is Default')->inline(false),
-                        Forms\Components\Hidden::make('swatch_type')
-                            ->default('color')
-                            ->visible(fn ($get, $livewire) =>
-                                ($livewire->data['type'] ?? null) === 'visual_swatch'
-                            )
-                            ->reactive(),
-                        Forms\Components\Hidden::make('swatch_type')->default('text')
-                            ->visible(fn ($get, $livewire) =>
-                                ($livewire->data['type'] ?? null) === 'text_swatch'
-                            ),
                         Forms\Components\ColorPicker::make('swatch_value')->label('Swatch Color')
                             ->visible(fn ($get, $livewire) =>
-                                ($livewire->data['type'] ?? null) === 'visual_swatch' &&
-                                $get('swatch_type') === 'color'
-                            ),
+                                ($livewire->data['type'] ?? null) === 'visual_swatch'),
                         Forms\Components\TextInput::make('swatch_value')->label('Swatch Text')->visible(fn ($livewire) => ($livewire->data['type'] ?? null) === 'text_swatch'),
                         Forms\Components\TextInput::make('value')->required()->maxLength(255)->label('Value'),
 
