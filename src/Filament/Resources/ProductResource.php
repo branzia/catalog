@@ -10,7 +10,7 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Branzia\Catalog\Models\Product;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Tabs;
+use Branzia\Tabs\Components\Tabs;
 use Branzia\Catalog\Models\Category;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Split;
@@ -231,7 +231,7 @@ class ProductResource extends Resource
                         'class' => 'bg-gray-100 rounded-lg p-4' 
                         ])
                 ])
-            ])->columnSpanFull(),   
+            ])->columnSpanFull()->contained(false)->align('left'),   
             Forms\Components\Section::make('Product Attributes')->schema([
                 Repeater::make('product_attributes')->relationship('productAttributes')->label('')->schema([
                         Select::make('attribute_id')

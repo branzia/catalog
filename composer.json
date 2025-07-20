@@ -5,7 +5,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "branzia/tax": "@dev",      
         "15web/filament-tree": "^1.0",
         "dvarilek/filament-table-select":"^2.0.3"
     },
